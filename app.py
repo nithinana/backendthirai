@@ -10,7 +10,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
-# CORS: allow all origins by default (or lock down to your GH Pages origin later)
+# CORS: allow all origins
 CORS(app)
 
 # ----------------- CONFIG -----------------
@@ -35,17 +35,15 @@ SESSION.headers.update({
     "Accept-Language": "en-US,en;q=0.9",
 })
 
-REQUEST_TIMEOUT = 8  # seconds
+REQUEST_TIMEOUT = 10  # Increased timeout for reliability
 
+# Refined Regular Expressions for cleaning titles
 TITLE_PATTERNS = [
-    (re.compile(r'^Einthusan\s*[-–—]\s*', re.IGNORECASE), ''),
-    (re.compile(r'\s*\(\d{4}\)\s*$'), ''),
+    (re.compile(r'^\s*Einthusan\s*[-–—]\s*', re.IGNORECASE), ''),
+    (re.compile(r'\s*\(\d{4}\)\s*$'), ''), # Removes (YYYY) from the end
     (re.compile(r'\s*\[(Tamil|Hindi|Telugu|Malayalam|Kannada|Bengali|Marathi|Punjabi)\]', re.IGNORECASE), ''),
-    (re.compile(r'\s*\(\d{4}\)\s*(?:Tamil|Hindi|Telugu|Malayalam|Kannada|Bengali|Marathi|Punjabi)\s*in\s*(?:HD|SD)\s*-\s*Einthusan.*$', re.IGNORECASE), ''),
-    (re.compile(r'\|\s*Einthusan.*$', re.IGNORECASE), ''),
-    (re.compile(r'Watch Full Movie Online Free$', re.IGNORECASE), ''),
-    (re.compile(r'Online Watch Free (?:HD|SD)$', re.IGNORECASE), ''),
-    (re.compile(r'Free Movies Online$', re.IGNORECASE), ''),
+    (re.compile(r'\s+Watch\s+Full\s+Movie.*$', re.IGNORECASE), ''),
+    (re.compile(r'\s+\|\s+Einthusan.*$', re.IGNORECASE), '')
 ]
 
 # ----------------- HELPERS -----------------
@@ -57,6 +55,7 @@ def correct_spelling(user_input: str):
     return match[0] if match else None
 
 def clean_title(title: str | None) -> str | None:
+    """Cleans the movie title using regex patterns."""
     if not title:
         return None
     title = title.strip()
@@ -65,91 +64,79 @@ def clean_title(title: str | None) -> str | None:
     return title.strip()
 
 @lru_cache(maxsize=256)
-def fetch_page(url: str) -> bytes | None:
+def fetch_page(url: str) -> str | None:
+    """Fetches the content of a URL."""
     try:
         resp = SESSION.get(url, timeout=REQUEST_TIMEOUT)
         resp.raise_for_status()
-        return resp.content
+        return resp.text
     except requests.RequestException:
         return None
 
-def try_extract_title_from_dom(soup: BeautifulSoup) -> str | None:
-    meta = soup.find('meta', property='og:title')
-    if meta and meta.get('content'):
-        cleaned = clean_title(meta['content'])
-        if cleaned:
-            return cleaned
-    if soup.title and soup.title.text:
-        cleaned = clean_title(soup.title.text)
-        if cleaned:
-            return cleaned
-    h1 = soup.find('h1')
-    if h1 and h1.text:
-        cleaned = clean_title(h1.text)
-        if cleaned:
-            return cleaned
-    return None
-
 def get_title_from_movie_page(page_url: str) -> str | None:
+    """Extracts title from the movie's own page for better accuracy."""
     content = fetch_page(page_url)
     if not content:
         return None
     soup = BeautifulSoup(content, 'html.parser')
-    return try_extract_title_from_dom(soup)
+    
+    # Try OpenGraph meta tag first
+    meta_title = soup.find('meta', property='og:title')
+    if meta_title and meta_title.get('content'):
+        cleaned_title = clean_title(meta_title['content'])
+        if cleaned_title:
+            return cleaned_title
+            
+    # Fallback to the <title> tag
+    if soup.title and soup.title.string:
+        cleaned_title = clean_title(soup.title.string)
+        if cleaned_title:
+            return cleaned_title
+            
+    return None
 
 def process_movie_block(div) -> dict | None:
-    a = div.find('a')
-    img = div.find('img')
-    title_div = div.find('div', class_='title')
-    if not (a and img):
+    """Processes a single movie block from the search/listing page."""
+    a_tag = div.find('a', href=True)
+    img_tag = div.find('img', src=True)
+
+    if not (a_tag and img_tag):
         return None
 
-    page_url_full = f"https://einthusan.tv{a.get('href','')}"
-    # Try multiple sources for title
-    candidates = []
-    if title_div and title_div.text:
-        candidates.append(title_div.text.strip())
-    if img and img.get('alt'):
-        candidates.append(img.get('alt').strip())
-    if img and img.get('title'):
-        candidates.append(img.get('title').strip())
+    page_url = f"https://einthusan.tv{a_tag['href']}"
+    
+    # The most reliable title is often in the 'alt' or 'title' attribute of the image
+    raw_title = img_tag.get('title') or img_tag.get('alt')
+    title = clean_title(raw_title)
 
-    title = None
-    for c in candidates:
-        cleaned = clean_title(c)
-        if cleaned and len(cleaned) > 2 and not cleaned.isdigit():
-            title = cleaned
-            break
+    # If the title from the image tag is poor, fetch the movie page as a fallback
+    if not title or len(title) < 2:
+        title = get_title_from_movie_page(page_url) or "Title not found"
 
-    # Fallback from slug
-    if not title and a.has_attr('href'):
-        href = a['href']
-        if '/watch/' in href:
-            try:
-                slug = href.split('/watch/')[1].split('/')[0]
-                decoded = unquote(slug)
-                guess = ' '.join(w.capitalize() for w in decoded.replace('-', ' ').split() if w and not w.isdigit())
-                title = clean_title(guess)
-            except Exception:
-                pass
+    img_url = img_tag.get('src')
+    # Make image URL absolute if it's relative
+    if img_url and not img_url.startswith('http'):
+        img_url = f"https://einthusan.tv{img_url}"
 
-    # Last resort: fetch the page and read og:title
-    if not title or len(title) < 3:
-        t = get_title_from_movie_page(page_url_full)
-        if t:
-            title = t
-        else:
-            title = "Untitled Movie"
-
-    img_url = img.get('src') or img.get('data-src') or ''
-    return {"title": title, "img_url": img_url, "page_url": page_url_full}
+    return {
+        "title": title,
+        "img_url": img_url,
+        "page_url": page_url
+    }
 
 def fetch_movies_by_url(url: str) -> list[dict]:
+    """Fetches and parses movies from a given Einthusan URL."""
     content = fetch_page(url)
     if not content:
         return []
+        
     soup = BeautifulSoup(content, 'html.parser')
-    blocks = soup.find_all('div', class_='block1')
+    # Target the container holding the movie blocks
+    movie_list_container = soup.find('div', class_='movie-results-container')
+    if not movie_list_container:
+        return []
+
+    blocks = movie_list_container.find_all('div', class_='block1')
     movies = []
     for b in blocks:
         item = process_movie_block(b)
@@ -158,6 +145,7 @@ def fetch_movies_by_url(url: str) -> list[dict]:
     return movies
 
 def search_movie(language: str, movie_title: str) -> list[dict]:
+    """Searches for a movie by language and title."""
     lang_code = LANGUAGE_CODES.get(language.lower())
     if not lang_code:
         return []
@@ -165,22 +153,22 @@ def search_movie(language: str, movie_title: str) -> list[dict]:
     return fetch_movies_by_url(url)
 
 def extract_video_url(page_url: str) -> str | None:
+    """Extracts the direct video URL from the movie page."""
     content = fetch_page(page_url)
     if not content:
         return None
-    soup = BeautifulSoup(content, 'html.parser')
-    # The site has historically kept a data-mp4-link on #UIVideoPlayer
-    player = soup.find(id="UIVideoPlayer")
-    if player:
-        mp4_link = player.get('data-mp4-link')
-        if mp4_link and "etv" in mp4_link:
-            try:
-                # Example: https://something/etvXYZ → normalize to CDN form used previously
-                tail = mp4_link.split("etv", 1)[1]
-                return f"https://cdn1.einthusan.io/etv{tail}"
-            except Exception:
-                pass
-    # If structure changes, return None (frontend can handle)
+    
+    # The video URL is often stored in a JavaScript variable or a data attribute.
+    # We can use regex to find it within the script tags.
+    match = re.search(r'data-mp4-link="([^"]+)"', content)
+    if match:
+        return match.group(1)
+        
+    # Fallback if the above pattern changes
+    match = re.search(r'let videoSrc\s*=\s*"([^"]+)"', content)
+    if match:
+        return match.group(1)
+
     return None
 
 # ----------------- ROUTES -----------------
@@ -208,7 +196,7 @@ def language_page(language):
 
     lang_code = LANGUAGE_CODES[corrected]
     if category == "popular":
-        url = f"https://einthusan.tv/movie/results/?find=Popularity&lang={lang_code}&ptype=view&tp=alltime&page={page}"
+        url = f"https://einthusan.tv/movie/results/?find=Popularity&lang={lang_code}&page={page}"
     else:  # recent (default)
         url = f"https://einthusan.tv/movie/results/?find=Recent&lang={lang_code}&page={page}"
 
@@ -218,7 +206,7 @@ def language_page(language):
         "category": category,
         "page": page,
         "movies": movies,
-        "next_page": page + 1,
+        "next_page": page + 1 if len(movies) > 0 else page,
         "has_more": len(movies) > 0
     })
 
@@ -238,10 +226,14 @@ def watch():
     movie_url = request.args.get("url", "").strip()
     if not movie_url:
         return jsonify({"error": "Movie URL missing"}), 400
-    title = get_title_from_movie_page(movie_url) or "Unknown"
+    
+    title = get_title_from_movie_page(movie_url) or "Unknown Title"
     video_url = extract_video_url(movie_url)
+    
+    if not video_url:
+        return jsonify({"error": "Could not find video URL for this movie.", "title": title}), 404
+        
     return jsonify({"title": title, "video_url": video_url})
 
 if __name__ == "__main__":
-    # Local dev: python app.py
     app.run(host="0.0.0.0", port=5000)
