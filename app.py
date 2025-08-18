@@ -8,6 +8,9 @@ from bs4 import BeautifulSoup
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
+# --- NEW: Import caching library ---
+from cachetools import cached, TTLCache
+
 app = Flask(__name__)
 
 # CORS: allow all origins by default (or lock down to your GH Pages origin later)
@@ -48,8 +51,15 @@ TITLE_PATTERNS = [
     (re.compile(r'Free Movies Online$', re.IGNORECASE), ''),
 ]
 
+# --- NEW: Define cache settings ---
+# Cache for web pages, with a TTL of 1 hour
+fetch_page_cache = TTLCache(maxsize=256, ttl=3600)
+# Cache for movie search results, with a TTL of 1 hour
+search_movie_cache = TTLCache(maxsize=128, ttl=3600)
+
 # ----------------- HELPERS -----------------
-@lru_cache(maxsize=128)
+# --- OLD: @lru_cache has been replaced with the new cache system below for consistency ---
+@cached(cache=TTLCache(maxsize=128, ttl=3600))
 def correct_spelling(user_input: str):
     """Fuzzy match a language key."""
     options = tuple(LANGUAGE_CODES.keys())
@@ -79,7 +89,8 @@ def looks_like_code(s: str | None) -> bool:
     no_vowel = not re.search(r'[AEIOUaeiou]', alpha) if alpha else False
     return one_token and simple and shortish and (has_digit or no_vowel)
 
-@lru_cache(maxsize=256)
+# --- OLD: @lru_cache was here. NEW: @cached decorator is now applied ---
+@cached(cache=fetch_page_cache)
 def fetch_page(url: str) -> bytes | None:
     try:
         resp = SESSION.get(url, timeout=REQUEST_TIMEOUT)
@@ -156,6 +167,8 @@ def process_movie_block(div) -> dict | None:
 
     return {"title": title, "img_url": img_url, "page_url": page_url_full}
 
+# --- OLD: No caching. NEW: @cached decorator is now applied ---
+@cached(cache=fetch_page_cache)
 def fetch_movies_by_url(url: str) -> list[dict]:
     content = fetch_page(url)
     if not content:
@@ -169,6 +182,8 @@ def fetch_movies_by_url(url: str) -> list[dict]:
             movies.append(item)
     return movies
 
+# --- OLD: No caching. NEW: @cached decorator is now applied ---
+@cached(cache=search_movie_cache)
 def search_movie(language: str, movie_title: str) -> list[dict]:
     lang_code = LANGUAGE_CODES.get(language.lower())
     if not lang_code:
@@ -176,6 +191,8 @@ def search_movie(language: str, movie_title: str) -> list[dict]:
     url = f"https://einthusan.tv/movie/results/?lang={lang_code}&query={quote_plus(movie_title)}"
     return fetch_movies_by_url(url)
 
+# --- OLD: No caching. NEW: @cached decorator is now applied ---
+@cached(cache=fetch_page_cache)
 def extract_video_url(page_url: str) -> str | None:
     content = fetch_page(page_url)
     if not content:
