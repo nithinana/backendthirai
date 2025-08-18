@@ -51,11 +51,11 @@ TITLE_PATTERNS = [
 ]
 
 # --- CACHE CONFIG ---
-fetch_page_cache = TTLCache(maxsize=256, ttl=3600)
-search_movie_cache = TTLCache(maxsize=128, ttl=3600)
+fetch_page_cache = TTLCache(maxsize=256, ttl=86400)
+search_movie_cache = TTLCache(maxsize=128, ttl=86400)
 
 # ----------------- HELPERS -----------------
-@cached(cache=TTLCache(maxsize=128, ttl=3600))
+@cached(cache=TTLCache(maxsize=128, ttl=86400))
 def correct_spelling(user_input: str):
     """Fuzzy match a language key."""
     options = tuple(LANGUAGE_CODES.keys())
