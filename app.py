@@ -8,7 +8,6 @@ from bs4 import BeautifulSoup
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-# --- NEW: Import caching library ---
 from cachetools import cached, TTLCache
 
 app = Flask(__name__)
@@ -51,14 +50,11 @@ TITLE_PATTERNS = [
     (re.compile(r'Free Movies Online$', re.IGNORECASE), ''),
 ]
 
-# --- NEW: Define cache settings ---
-# Cache for web pages, with a TTL of 1 hour
+# --- CACHE CONFIG ---
 fetch_page_cache = TTLCache(maxsize=256, ttl=3600)
-# Cache for movie search results, with a TTL of 1 hour
 search_movie_cache = TTLCache(maxsize=128, ttl=3600)
 
 # ----------------- HELPERS -----------------
-# --- OLD: @lru_cache has been replaced with the new cache system below for consistency ---
 @cached(cache=TTLCache(maxsize=128, ttl=3600))
 def correct_spelling(user_input: str):
     """Fuzzy match a language key."""
@@ -89,7 +85,6 @@ def looks_like_code(s: str | None) -> bool:
     no_vowel = not re.search(r'[AEIOUaeiou]', alpha) if alpha else False
     return one_token and simple and shortish and (has_digit or no_vowel)
 
-# --- OLD: @lru_cache was here. NEW: @cached decorator is now applied ---
 @cached(cache=fetch_page_cache)
 def fetch_page(url: str) -> bytes | None:
     try:
@@ -132,7 +127,6 @@ def process_movie_block(div) -> dict | None:
 
     page_url_full = f"https://einthusan.tv{a.get('href','')}"
 
-    # Try multiple sources for title
     candidates = []
     if title_div and title_div.text:
         candidates.append(title_div.text.strip())
@@ -148,17 +142,11 @@ def process_movie_block(div) -> dict | None:
             title = cleaned
             break
 
-    # 🚨 FIX: The fallback from slug was removed as it produced incorrect titles
-    # like "53ba". The logic will now proceed to fetch the page title if the
-    # initial scrape from the list page yields no good title.
-
-    # If still missing, too short, or looks like an alphanumeric code → fetch page title
     if not title or len(title) < 3 or looks_like_code(title):
         t = get_title_from_movie_page(page_url_full)
         if t:
             title = t
         else:
-            # Fallback if page fetch fails or yields no title
             title = "Untitled Movie"
 
     img_url = img.get('src') or img.get('data-src') or img.get('data-original') or ''
@@ -167,7 +155,6 @@ def process_movie_block(div) -> dict | None:
 
     return {"title": title, "img_url": img_url, "page_url": page_url_full}
 
-# --- OLD: No caching. NEW: @cached decorator is now applied ---
 @cached(cache=fetch_page_cache)
 def fetch_movies_by_url(url: str) -> list[dict]:
     content = fetch_page(url)
@@ -182,7 +169,6 @@ def fetch_movies_by_url(url: str) -> list[dict]:
             movies.append(item)
     return movies
 
-# --- OLD: No caching. NEW: @cached decorator is now applied ---
 @cached(cache=search_movie_cache)
 def search_movie(language: str, movie_title: str) -> list[dict]:
     lang_code = LANGUAGE_CODES.get(language.lower())
@@ -191,22 +177,24 @@ def search_movie(language: str, movie_title: str) -> list[dict]:
     url = f"https://einthusan.tv/movie/results/?lang={lang_code}&query={quote_plus(movie_title)}"
     return fetch_movies_by_url(url)
 
-# --- OLD: No caching. NEW: @cached decorator is now applied ---
-@cached(cache=fetch_page_cache)
+# --- NEW: Add a try-except block for robust error handling ---
 def extract_video_url(page_url: str) -> str | None:
     content = fetch_page(page_url)
     if not content:
         return None
-    soup = BeautifulSoup(content, 'html.parser')
-    player = soup.find(id="UIVideoPlayer")
-    if player:
-        mp4_link = player.get('data-mp4-link')
-        if mp4_link and "etv" in mp4_link:
-            try:
+    
+    try:
+        soup = BeautifulSoup(content, 'html.parser')
+        player = soup.find(id="UIVideoPlayer")
+        if player:
+            mp4_link = player.get('data-mp4-link')
+            if mp4_link and "etv" in mp4_link:
                 tail = mp4_link.split("etv", 1)[1]
                 return f"https://cdn1.einthusan.io/etv{tail}"
-            except Exception:
-                pass
+    except Exception as e:
+        print(f"Error extracting video URL from {page_url}: {e}")
+        return None
+    
     return None
 
 # ----------------- ROUTES -----------------
@@ -262,16 +250,26 @@ def search_route(language):
 @app.get("/watch")
 def watch():
     movie_url = request.args.get("url", "").strip()
+    movie_title_from_url = request.args.get("title", "").strip()
+
     if not movie_url:
         return jsonify({"error": "Movie URL missing"}), 400
 
-    title = get_title_from_movie_page(movie_url)
-    if title:
-        title = clean_title(title)
+    if movie_title_from_url:
+        title = unquote(movie_title_from_url)
+    else:
+        title = get_title_from_movie_page(movie_url)
+        if title:
+            title = clean_title(title)
+
     if not title or looks_like_code(title):
         title = "Unknown"
 
     video_url = extract_video_url(movie_url)
+    
+    if not video_url:
+        return jsonify({"error": "Failed to extract video URL from the page."}), 500
+
     return jsonify({"title": title, "video_url": video_url})
 
 if __name__ == "__main__":
