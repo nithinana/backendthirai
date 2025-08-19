@@ -1,0 +1,498 @@
+{
+  "tamil": [
+    {
+      "title": "Raja Rani",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2223-7856.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2223/?lang=tamil"
+    },
+    {
+      "title": "Thani Oruvan",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2786-70f7.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2786/?lang=tamil"
+    },
+    {
+      "title": "Theri",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2937-2069.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2937/?lang=tamil"
+    },
+    {
+      "title": "Thuppakki",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/1327-224f.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/1327/?lang=tamil"
+    },
+    {
+      "title": "Soodhu Kavvuum",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/1671-52bd.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/1671/?lang=tamil"
+    },
+    {
+      "title": "O Kadhal Kanmani",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2639-bcaf.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2639/?lang=tamil"
+    },
+    {
+      "title": "Singam",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/0037-d004.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/0037/?lang=tamil"
+    },
+    {
+      "title": "96",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2Fbx-1ce4.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2Fbx/?lang=tamil"
+    },
+    {
+      "title": "Yennai Arindhaal",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2588-9858.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2588/?lang=tamil"
+    },
+    {
+      "title": "Aambala",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2609-74c1.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2609/?lang=tamil"
+    },
+    {
+      "title": "Varuthapadatha Valibar Sangam",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2214-2f58.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2214/?lang=tamil"
+    },
+    {
+      "title": "Arrambam",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2254-6bec.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2254/?lang=tamil"
+    }
+  ],
+  "hindi": [
+    {
+      "title": "Dil Dhadakne Do",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2728-6ddc.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2728/?lang=hindi"
+    },
+    {
+      "title": "Goliyon Ki Raasleela Ram Leela",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2277-b511.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2277/?lang=hindi"
+    },
+    {
+      "title": "Sultan",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/9032-007c.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/9032/?lang=hindi"
+    },
+    {
+      "title": "Bajirao Mastani",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2887-0159.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2887/?lang=hindi"
+    },
+    {
+      "title": "Sanam Teri Kasam",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2886-155f.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2886/?lang=hindi"
+    },
+    {
+      "title": "Kabhi Khushi Kabhie Gham",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/0442-a982.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/0442/?lang=hindi"
+    },
+    {
+      "title": "Queen",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2356-53ed.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2356/?lang=hindi"
+    },
+    {
+      "title": "Bajrangi Bhaijaan",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2737-3b94.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2737/?lang=hindi"
+    },
+    {
+      "title": "Dilwale",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2840-8ef2.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2840/?lang=hindi"
+    },
+    {
+      "title": "Kapoor And Sons",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2907-4ca8.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2907/?lang=hindi"
+    },
+    {
+      "title": "Humpty Sharma Ki Dulhania",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2464-8daa.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2464/?lang=hindi"
+    },
+    {
+      "title": "Tanu Weds Manu Returns",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2679-1113.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2679/?lang=hindi"
+    }
+  ],
+  "telugu": [
+    {
+      "title": "Arjun Reddy",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/1RPl-17d0.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/1RPl/?lang=telugu"
+    },
+    {
+      "title": "Manam",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2555-9162.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2555/?lang=telugu"
+    },
+    {
+      "title": "Geetha Govindham",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2RmX-c102.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2RmX/?lang=telugu"
+    },
+    {
+      "title": "Son Of Satyamurthy",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2858-ec05.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2858/?lang=telugu"
+    },
+    {
+      "title": "A Aa",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/9050-2d38.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/9050/?lang=telugu"
+    },
+    {
+      "title": "Brahmotsavam",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/9020-6dee.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/9020/?lang=telugu"
+    },
+    {
+      "title": "Soggade Chinni Nayana",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2875-0756.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2875/?lang=telugu"
+    },
+    {
+      "title": "Srimanthudu",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2925-1b71.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2925/?lang=telugu"
+    },
+    {
+      "title": "Oopiri",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2911-0846.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2911/?lang=telugu"
+    },
+    {
+      "title": "Nenu Sailaja",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2999-ee99.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2999/?lang=telugu"
+    },
+    {
+      "title": "Race Gurram",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/3033-db79.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/3033/?lang=telugu"
+    },
+    {
+      "title": "Kalyana Vaibhogame",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/9041-581e.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/9041/?lang=telugu"
+    }
+  ],
+  "malayalam": [
+    {
+      "title": "Bangalore Days",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2473-2cf9.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2473/?lang=malayalam"
+    },
+    {
+      "title": "Premam",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/3175-1154.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/3175/?lang=malayalam"
+    },
+    {
+      "title": "Drishyam",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2384-f1d0.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2384/?lang=malayalam"
+    },
+    {
+      "title": "Ohm Shanthi Oshaana",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2185-d05d.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2185/?lang=malayalam"
+    },
+    {
+      "title": "Charlie",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2902-c7e3.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2902/?lang=malayalam"
+    },
+    {
+      "title": "Kali",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2964-5728.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2964/?lang=malayalam"
+    },
+    {
+      "title": "Action Hero Biju",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2939-fd2e.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2939/?lang=malayalam"
+    },
+    {
+      "title": "Ustad Hotel",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/5160-65d7.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/5160/?lang=malayalam"
+    },
+    {
+      "title": "ABCD: American-Born Confused Desi",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/1929-b207.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/1929/?lang=malayalam"
+    },
+    {
+      "title": "Jacobinte Swargarajyam",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/9012-fd32.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/9012/?lang=malayalam"
+    },
+    {
+      "title": "Oru Vadakkan Selfie",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/3147-9162.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/3147/?lang=malayalam"
+    },
+    {
+      "title": "Two Countries",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2913-83b6.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2913/?lang=malayalam"
+    }
+  ],
+  "kannada": [
+    {
+      "title": "K.G.F: Chapter 1",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/7fIZ-fad5.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/7fIZ/?lang=kannada"
+    },
+    {
+      "title": "U Turn",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/9063-746b.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/9063/?lang=kannada"
+    },
+    {
+      "title": "Ranna",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/4146-b6f5.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/4146/?lang=kannada"
+    },
+    {
+      "title": "Kirik Party",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/KVBZ-384f.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/KVBZ/?lang=kannada"
+    },
+    {
+      "title": "K.G.F Chapter 2",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/64cX-00fd.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/64cX/?lang=kannada"
+    },
+    {
+      "title": "Mercury (2018) Tamil, Hindi, Kannada, Malayalam, Telugu in HD - Einthusan",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/3qel-8053.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/3qel/?lang=kannada"
+    },
+    {
+      "title": "Garuda Gamana Vrishabha Vahana",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/1ruh-2125.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/1ruh/?lang=kannada"
+    },
+    {
+      "title": "Kantara",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/6QYZ-d145.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/6QYZ/?lang=kannada"
+    },
+    {
+      "title": "Kavaludaari",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/4Nk1-ed9e.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/4Nk1/?lang=kannada"
+    },
+    {
+      "title": "Ramachaari",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/4032-6482.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/4032/?lang=kannada"
+    },
+    {
+      "title": "Kendasampige",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2956-c779.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2956/?lang=kannada"
+    },
+    {
+      "title": "Vajrakaya",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2873-56d1.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2873/?lang=kannada"
+    }
+  ],
+  "bengali": [
+    {
+      "title": "Bolo Dugga Maiki",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2UAz-d0b3.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2UAz/?lang=bengali"
+    },
+    {
+      "title": "Shudhu Tomari Jonyo",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/9017-97c6.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/9017/?lang=bengali"
+    },
+    {
+      "title": "Ki Kore Toke Bolbo",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/9028-4ba7.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/9028/?lang=bengali"
+    },
+    {
+      "title": "Total Dadagiri",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/6c32-0ea3.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/6c32/?lang=bengali"
+    },
+    {
+      "title": "Har Har Byomkesh",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2877-a6d3.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2877/?lang=bengali"
+    },
+    {
+      "title": "Haami",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/ijyg-7824.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/ijyg/?lang=bengali"
+    },
+    {
+      "title": "Yeti Obhijaan",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/7fuH-4b01.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/7fuH/?lang=bengali"
+    },
+    {
+      "title": "Rajkahini",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2871-59d2.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2871/?lang=bengali"
+    },
+    {
+      "title": "Villain",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/31FG-51ce.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/31FG/?lang=bengali"
+    },
+    {
+      "title": "Mukti",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/1Q5H-ed2f.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/1Q5H/?lang=bengali"
+    },
+    {
+      "title": "Generation Aami",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/7zMK-7874.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/7zMK/?lang=bengali"
+    },
+    {
+      "title": "Kanamachi",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/5820-c213.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/5820/?lang=bengali"
+    }
+  ],
+  "marathi": [
+    {
+      "title": "Sairat",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2994-9b97.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2994/?lang=marathi"
+    },
+    {
+      "title": "Katyar Kalijat Ghusali",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2783-a81b.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2783/?lang=marathi"
+    },
+    {
+      "title": "Natsamrat",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2916-ccc5.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2916/?lang=marathi"
+    },
+    {
+      "title": "Double Seat",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/5154-945b.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/5154/?lang=marathi"
+    },
+    {
+      "title": "Mumbai Pune Mumbai 3",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/7odK-8d90.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/7odK/?lang=marathi"
+    },
+    {
+      "title": "YZ",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/9091-0e02.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/9091/?lang=marathi"
+    },
+    {
+      "title": "Aga Bai Arechyaa 2",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/3201-62b3.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/3201/?lang=marathi"
+    },
+    {
+      "title": "Timepass 2",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/4182-9f75.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/4182/?lang=marathi"
+    },
+    {
+      "title": "Classmates",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2881-76c8.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2881/?lang=marathi"
+    },
+    {
+      "title": "Muramba",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/Edfi-ce75.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/Edfi/?lang=marathi"
+    },
+    {
+      "title": "Timepass",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/4186-94c2.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/4186/?lang=marathi"
+    },
+    {
+      "title": "Poshter Girl",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2930-ce4f.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2930/?lang=marathi"
+    }
+  ],
+  "punjabi": [
+    {
+      "title": "Ambarsariya",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/9043-1214.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/9043/?lang=punjabi"
+    },
+    {
+      "title": "Angrej",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2802-d2b8.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2802/?lang=punjabi"
+    },
+    {
+      "title": "Love Punjab",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2970-b798.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2970/?lang=punjabi"
+    },
+    {
+      "title": "Manje Bistre",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/36mf-e7c7.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/36mf/?lang=punjabi"
+    },
+    {
+      "title": "Carry On Jatta 2",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/1bIR-53f8.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/1bIR/?lang=punjabi"
+    },
+    {
+      "title": "Lahoriye",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2Gki-6a35.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2Gki/?lang=punjabi"
+    },
+    {
+      "title": "Mukhtiar Chadha",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/2852-f61d.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/2852/?lang=punjabi"
+    },
+    {
+      "title": "Honsla Rakh",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/7a42-e88f.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/7a42/?lang=punjabi"
+    },
+    {
+      "title": "Vekh Baraathan Challiyan",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/5Ozp-cd14.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/5Ozp/?lang=punjabi"
+    },
+    {
+      "title": "Laung Laachi",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/7yTf-20dd.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/7yTf/?lang=punjabi"
+    },
+    {
+      "title": "Shadaa",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/6OIG-922d.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/6OIG/?lang=punjabi"
+    },
+    {
+      "title": "Sardaar Ji 2",
+      "img_url": "https://img.einthusan.io/etv/s3/moviecovers/3dxO-f1f9.jpg",
+      "page_url": "https://einthusan.tv/movie/watch/3dxO/?lang=punjabi"
+    }
+  ]
+}

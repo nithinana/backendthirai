@@ -1,5 +1,7 @@
 import re
 import difflib
+import json # New: Import the json library for file operations
+import os # New: Import the os library to check for file existence
 from functools import lru_cache
 from urllib.parse import unquote, quote_plus
 
@@ -53,6 +55,12 @@ TITLE_PATTERNS = [
 # --- CACHE CONFIG ---
 fetch_page_cache = TTLCache(maxsize=256, ttl=86400)
 search_movie_cache = TTLCache(maxsize=128, ttl=86400)
+
+# --- NEW: File path for persistent cache
+POPULAR_CACHE_FILE = "popular_cache.json"
+
+# --- NEW: In-memory cache to hold the data loaded from the file
+popular_movies_cache = {}
 
 # ----------------- HELPERS -----------------
 @cached(cache=TTLCache(maxsize=128, ttl=86400))
@@ -197,6 +205,51 @@ def extract_video_url(page_url: str) -> str | None:
     
     return None
 
+# --- NEW: Function to pre-load and cache popular movie pages
+def preload_popular_movies():
+    """
+    Checks for and loads popular movie data from a JSON file.
+    If the file doesn't exist, it scrapes the data and saves it.
+    """
+    global popular_movies_cache
+    if os.path.exists(POPULAR_CACHE_FILE):
+        print("Found existing popular movies cache. Loading from file...")
+        try:
+            with open(POPULAR_CACHE_FILE, 'r') as f:
+                popular_movies_cache = json.load(f)
+            print("Cache loaded successfully.")
+            return
+        except (IOError, json.JSONDecodeError) as e:
+            print(f"Error loading cache file: {e}. Re-scraping data.")
+
+    print("Cache file not found or corrupted. Pre-loading popular movies...")
+    new_cache = {}
+    for language in LANGUAGE_CODES.keys():
+        lang_code = LANGUAGE_CODES[language]
+        
+        # Fetch page 1
+        url_page1 = f"https://einthusan.tv/movie/results/?find=Popularity&lang={lang_code}&ptype=view&tp=alltime&page=1"
+        movies_page1 = fetch_movies_by_url(url_page1)
+
+        # Fetch page 2
+        url_page2 = f"https://einthusan.tv/movie/results/?find=Popularity&lang={lang_code}&ptype=view&tp=alltime&page=2"
+        movies_page2 = fetch_movies_by_url(url_page2)
+
+        # Store the combined list
+        new_cache[language] = movies_page1 + movies_page2
+        print(f"Loaded {len(new_cache[language])} movies for {language}.")
+
+    # Save the new cache to a file
+    try:
+        with open(POPULAR_CACHE_FILE, 'w') as f:
+            json.dump(new_cache, f, indent=2)
+        print("Cache saved to file.")
+    except IOError as e:
+        print(f"Warning: Could not save cache file. {e}")
+
+    popular_movies_cache = new_cache
+
+
 # ----------------- ROUTES -----------------
 @app.get("/")
 def root():
@@ -204,12 +257,29 @@ def root():
         "/language/<language>?category=popular|recent&page=1",
         "/search/<language>?q=QUERY",
         "/watch?url=<encoded_movie_page_url>",
+        "/popular_cache",
         "/healthz"
     ]})
 
 @app.get("/healthz")
 def healthz():
     return "ok", 200
+
+# --- NEW: Route to serve the cached popular data as JSON ---
+@app.get("/popular_cache")
+def serve_popular_cache():
+    """
+    Serves the pre-loaded popular movies data from the local JSON file.
+    """
+    if not os.path.exists(POPULAR_CACHE_FILE):
+        return jsonify({"error": "Cache file not found."}), 404
+    
+    try:
+        with open(POPULAR_CACHE_FILE, 'r') as f:
+            data = json.load(f)
+        return jsonify(data)
+    except json.JSONDecodeError:
+        return jsonify({"error": "Cache file is corrupted."}), 500
 
 @app.get("/language/<language>")
 def language_page(language):
@@ -220,6 +290,30 @@ def language_page(language):
     if not corrected:
         return jsonify({"error": "Invalid language"}), 400
 
+    # Check if the request is for a pre-loaded popular page
+    if category == "popular" and page in (1, 2) and corrected in popular_movies_cache:
+        # Change page_size from 20 to 6
+        page_size = 6
+        start_index = (page - 1) * page_size
+        end_index = start_index + page_size
+        
+        # Get the slice of movies for the current page
+        all_movies_for_lang = popular_movies_cache[corrected]
+        movies = all_movies_for_lang[start_index:end_index]
+        
+        # Check if there are more movies beyond the current page
+        has_more = end_index < len(all_movies_for_lang)
+        
+        return jsonify({
+            "language": corrected,
+            "category": category,
+            "page": page,
+            "movies": movies,
+            "next_page": page + 1,
+            "has_more": has_more
+        })
+
+    # Original logic for all other requests (recent, or popular pages > 2)
     lang_code = LANGUAGE_CODES[corrected]
     if category == "popular":
         url = f"https://einthusan.tv/movie/results/?find=Popularity&lang={lang_code}&ptype=view&tp=alltime&page={page}"
@@ -273,4 +367,6 @@ def watch():
     return jsonify({"title": title, "video_url": video_url})
 
 if __name__ == "__main__":
+    # Load or create the cache file before starting the server
+    preload_popular_movies()
     app.run(host="0.0.0.0", port=5000)
