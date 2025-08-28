@@ -39,11 +39,18 @@ SESSION.headers.update({
 
 REQUEST_TIMEOUT = 8  # seconds
 
+# UPDATED: We're adding a new, more comprehensive pattern to handle
+# the "language in HD - Einthusan" case more effectively, and re-ordering
+# the patterns to ensure the most specific ones are checked first.
 TITLE_PATTERNS = [
+    # This new pattern is designed to catch the language, quality, and site name
+    # in various formats, with or without a year.
+    (re.compile(r'\s*\(\d{4}\)\s*(?:Tamil|Hindi|Telugu|Malayalam|Kannada|Bengali|Marathi|Punjabi)\s*in\s*(?:HD|SD)\s*-\s*Einthusan.*$', re.IGNORECASE), ''),
+    (re.compile(r'\s*\(\d{4}\)\s*(?:(?:Tamil|Hindi|Telugu|Malayalam|Kannada|Bengali|Marathi|Punjabi)\s*(?:,)?\s*)+\s*in\s*(?:HD|SD)\s*-\s*Einthusan.*$', re.IGNORECASE), ''),
+    (re.compile(r'\s*(?:Tamil|Hindi|Telugu|Malayalam|Kannada|Bengali|Marathi|Punjabi)\s*in\s*(?:HD|SD)\s*-\s*Einthusan.*$', re.IGNORECASE), ''),
     (re.compile(r'^Einthusan\s*[-–—]\s*', re.IGNORECASE), ''),
     (re.compile(r'\s*\(\d{4}\)\s*$'), ''),
     (re.compile(r'\s*\[(Tamil|Hindi|Telugu|Malayalam|Kannada|Bengali|Marathi|Punjabi)\]', re.IGNORECASE), ''),
-    (re.compile(r'\s*\(\d{4}\)\s*(?:Tamil|Hindi|Telugu|Malayalam|Kannada|Bengali|Marathi|Punjabi)\s*in\s*(?:HD|SD)\s*-\s*Einthusan.*$', re.IGNORECASE), ''),
     (re.compile(r'\|\s*Einthusan.*$', re.IGNORECASE), ''),
     (re.compile(r'Watch Full Movie Online Free$', re.IGNORECASE), ''),
     (re.compile(r'Online Watch Free (?:HD|SD)$', re.IGNORECASE), ''),
@@ -71,11 +78,14 @@ def clean_title(title: str | None) -> str | None:
     return title.strip()
 
 def looks_like_code(s: str | None) -> bool:
-    """Detect short alphanumeric codes like '53BA', '1S2Q', 'MukD' etc."""
+    """Detect short alphanumeric codes like '53BA', '1S2Q', 'MukD' etc.
+    This version correctly ignores titles that are purely numbers, like "96"."""
     if not s:
         return False
     s2 = s.strip()
     if not s2:
+        return False
+    if s2.isdigit():
         return False
     one_token = len(s2.split()) == 1
     simple = re.fullmatch(r'[A-Za-z0-9]+', s2) is not None
