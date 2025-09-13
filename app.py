@@ -58,8 +58,8 @@ TITLE_PATTERNS = [
 ]
 
 # --- CACHE CONFIG ---
-fetch_page_cache = TTLCache(maxsize=256, ttl=86400)
-search_movie_cache = TTLCache(maxsize=128, ttl=86400)
+fetch_page_cache = TTLCache(maxsize=256, ttl=432000)
+search_movie_cache = TTLCache(maxsize=128, ttl=432000)
 
 # ----------------- HELPERS -----------------
 @cached(cache=TTLCache(maxsize=128, ttl=86400))
