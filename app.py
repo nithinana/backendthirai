@@ -1,5 +1,7 @@
 import re
 import difflib
+import threading
+import time
 from functools import lru_cache
 from urllib.parse import unquote, quote_plus
 
@@ -207,6 +209,25 @@ def extract_video_url(page_url: str) -> str | None:
     
     return None
 
+# --- NEW: Function to pre-load caches on startup ---
+def preload_caches():
+    """Fetches and caches the first page of recent movies for all languages."""
+    print("--- Pre-loading initial movie data into cache ---")
+    # Give the server a moment to start before we fire off requests
+    time.sleep(2)
+    for lang_name, lang_code in LANGUAGE_CODES.items():
+        for page in [1]: # Only fetch the first page
+            url = f"https://einthusan.tv/movie/results/?find=Recent&lang={lang_code}&page={page}"
+            print(f"Caching recent movies for '{lang_name}' (page {page})...")
+            try:
+                # This call will populate the cache due to the @cached decorator
+                fetch_movies_by_url(url)
+                # Small delay to be polite to the server
+                time.sleep(0.5)
+            except Exception as e:
+                print(f"  -> Error caching {url}: {e}")
+    print("--- Caching preload complete ---")
+
 # ----------------- ROUTES -----------------
 @app.get("/")
 def root():
@@ -283,4 +304,9 @@ def watch():
     return jsonify({"title": title, "video_url": video_url})
 
 if __name__ == "__main__":
+    # Run the cache pre-loading process in a background thread
+    # so it doesn't block the server from starting.
+    caching_thread = threading.Thread(target=preload_caches, daemon=True)
+    caching_thread.start()
+
     app.run(host="0.0.0.0", port=5000)
