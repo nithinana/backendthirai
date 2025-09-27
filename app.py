@@ -62,6 +62,9 @@ TITLE_PATTERNS = [
 # --- CACHE CONFIG ---
 fetch_page_cache = TTLCache(maxsize=256, ttl=432000)
 search_movie_cache = TTLCache(maxsize=128, ttl=432000)
+popular_actors_cache = TTLCache(maxsize=len(LANGUAGE_CODES), ttl=86400 * 7)
+# FIX: Dedicated cache for movie lists
+movie_list_cache = TTLCache(maxsize=256, ttl=432000) 
 
 # ----------------- HELPERS -----------------
 @cached(cache=TTLCache(maxsize=128, ttl=86400))
@@ -102,6 +105,7 @@ def fetch_page(url: str) -> bytes | None:
     try:
         resp = SESSION.get(url, timeout=REQUEST_TIMEOUT)
         resp.raise_for_status()
+        # This function MUST return bytes or None
         return resp.content
     except requests.RequestException:
         return None
@@ -167,8 +171,9 @@ def process_movie_block(div) -> dict | None:
 
     return {"title": title, "img_url": img_url, "page_url": page_url_full}
 
-@cached(cache=fetch_page_cache)
+@cached(cache=movie_list_cache)
 def fetch_movies_by_url(url: str) -> list[dict]:
+    # fetch_page returns bytes or None, which is correct
     content = fetch_page(url)
     if not content:
         return []
@@ -179,6 +184,7 @@ def fetch_movies_by_url(url: str) -> list[dict]:
         item = process_movie_block(b)
         if item:
             movies.append(item)
+    # This function returns a list, which is stored in movie_list_cache
     return movies
 
 @cached(cache=search_movie_cache)
@@ -189,12 +195,110 @@ def search_movie(language: str, movie_title: str) -> list[dict]:
     url = f"https://einthusan.tv/movie/results/?lang={lang_code}&query={quote_plus(movie_title)}"
     return fetch_movies_by_url(url)
 
+# --- NEW: Actor/Cast Helpers ---
+
+@cached(cache=popular_actors_cache)
+def fetch_popular_actors(language: str) -> list[dict]:
+    """Fetches a list of popular actors for a given language."""
+    lang_code = LANGUAGE_CODES.get(language.lower())
+    if not lang_code:
+        return []
+
+    url = f"https://einthusan.tv/movie/results/?find=Cast&lang={lang_code}"
+    content = fetch_page(url)
+    if not content:
+        return []
+
+    soup = BeautifulSoup(content, 'html.parser')
+    actor_list_div = soup.find('div', class_='mid-body')
+
+    if not actor_list_div:
+        return []
+
+    actors = []
+    # Find all list items inside the mid-body, which contain actor info
+    for a in actor_list_div.find_all('a', href=re.compile(r'/movie/results/\?find=Cast&id=.*')):
+        name = a.text.strip()
+        href = a.get('href')
+
+        # Extract the actor ID from the 'id' query parameter in the href
+        match = re.search(r'id=([^&]+)', href)
+        if name and match:
+            actor_id = match.group(1)
+            actors.append({
+                "name": name,
+                "actor_id": actor_id,
+            })
+
+    return actors
+
+# MODIFIED FUNCTION: Scrapes the actor name using the page title for robustness.
+@cached(cache=TTLCache(maxsize=128, ttl=86400)) # Cache the name for a day
+def get_actor_name_from_movie_results_page(language: str, actor_id: str) -> str | None:
+    lang_code = LANGUAGE_CODES.get(language.lower())
+    if not lang_code:
+        return None
+
+    url = (
+        f"https://einthusan.tv/movie/results/"
+        f"?find=Cast&id={actor_id}&lang={lang_code}&role=&page=1"
+    )
+    content = fetch_page(url) 
+    if not content:
+        return None
+
+    soup = BeautifulSoup(content, 'html.parser')
+    
+    # NEW ROBUST LOGIC: Scrape from the page's <title> tag
+    if soup.title and soup.title.text:
+        title_text = soup.title.text
+        # Example title: "Tamil Movies starring Ajith Kumar - Einthusan"
+        # The site structure is generally [Language] Movies starring [Actor Name] - [Site Name]
+        match = re.search(r'Movies starring (.*?) - Einthusan', title_text, re.IGNORECASE)
+        if match:
+            # We strip the language name if it's still present at the start
+            name_part = match.group(1).strip()
+            # Clean up the name part, e.g., "Tamil Rajinikanth" -> "Rajinikanth"
+            for lang in LANGUAGE_CODES.keys():
+                name_part = re.sub(rf'^{lang}\s+', '', name_part, flags=re.IGNORECASE).strip()
+            
+            if name_part:
+                return name_part
+            
+    # Fallback to the previous H2 logic, just in case
+    mid_body = soup.find('div', class_='mid-body')
+    if mid_body:
+        h2 = mid_body.find('h2')
+        if h2 and h2.text:
+            match = re.search(r'Movies starring (.*)', h2.text, re.IGNORECASE)
+            if match:
+                return match.group(1).strip()
+            return h2.text.strip()
+            
+    return None 
+
+@cached(cache=movie_list_cache)
+def fetch_movies_by_actor_id(language: str, actor_id: str, page: int) -> list[dict]:
+    """Fetches movies for a specific actor ID."""
+    lang_code = LANGUAGE_CODES.get(language.lower())
+    if not lang_code:
+        return []
+
+    # The URL structure for an actor's movies (with pagination)
+    url = (
+        f"https://einthusan.tv/movie/results/"
+        f"?find=Cast&id={actor_id}&lang={lang_code}&role=&page={page}"
+    )
+
+    # We can reuse the existing fetch_movies_by_url function to process the results
+    return fetch_movies_by_url(url)
+
 # --- NEW: Add a try-except block for robust error handling ---
 def extract_video_url(page_url: str) -> str | None:
     content = fetch_page(page_url)
     if not content:
         return None
-    
+
     try:
         soup = BeautifulSoup(content, 'html.parser')
         player = soup.find(id="UIVideoPlayer")
@@ -206,27 +310,8 @@ def extract_video_url(page_url: str) -> str | None:
     except Exception as e:
         print(f"Error extracting video URL from {page_url}: {e}")
         return None
-    
-    return None
 
-# --- NEW: Function to pre-load caches on startup ---
-def preload_caches():
-    """Fetches and caches the first page of recent movies for all languages."""
-    print("--- Pre-loading initial movie data into cache ---")
-    # Give the server a moment to start before we fire off requests
-    time.sleep(2)
-    for lang_name, lang_code in LANGUAGE_CODES.items():
-        for page in [1]: # Only fetch the first page
-            url = f"https://einthusan.tv/movie/results/?find=Recent&lang={lang_code}&page={page}"
-            print(f"Caching recent movies for '{lang_name}' (page {page})...")
-            try:
-                # This call will populate the cache due to the @cached decorator
-                fetch_movies_by_url(url)
-                # Small delay to be polite to the server
-                time.sleep(0.5)
-            except Exception as e:
-                print(f"  -> Error caching {url}: {e}")
-    print("--- Caching preload complete ---")
+    return None
 
 # ----------------- ROUTES -----------------
 @app.get("/")
@@ -235,6 +320,8 @@ def root():
         "/language/<language>?category=popular|recent&page=1",
         "/search/<language>?q=QUERY",
         "/watch?url=<encoded_movie_page_url>",
+        "/actors/<language>",
+        "/actors/<language>/<actor_id>?page=1",
         "/healthz"
     ]})
 
@@ -297,16 +384,63 @@ def watch():
         title = "Unknown"
 
     video_url = extract_video_url(movie_url)
-    
+
     if not video_url:
         return jsonify({"error": "Failed to extract video URL from the page."}), 500
 
     return jsonify({"title": title, "video_url": video_url})
 
-if __name__ == "__main__":
-    # Run the cache pre-loading process in a background thread
-    # so it doesn't block the server from starting.
-    caching_thread = threading.Thread(target=preload_caches, daemon=True)
-    caching_thread.start()
+# ----------------- NEW ACTOR/CAST ROUTES -----------------
 
+@app.get("/actors/<language>")
+def actors_route(language):
+    corrected = correct_spelling(language)
+    if not corrected:
+        return jsonify({"error": "Invalid language"}), 400
+
+    actors = fetch_popular_actors(corrected)
+
+    return jsonify({
+        "language": corrected,
+        "actors": actors,
+        "has_actors": len(actors) > 0
+    })
+
+@app.get("/actors/<language>/<actor_id>")
+def actor_movies_route(language, actor_id):
+    page = request.args.get("page", 1, type=int)
+
+    corrected = correct_spelling(language)
+    if not corrected:
+        return jsonify({"error": "Invalid language"}), 400
+
+    movies = fetch_movies_by_actor_id(corrected, actor_id, page)
+
+    # 1. ATTEMPT NAME LOOKUP FROM CACHED POPULAR LIST (Fastest)
+    actor_name = "Unknown Actor"
+    actors_list = fetch_popular_actors(corrected)
+    for actor in actors_list:
+        if actor["actor_id"] == actor_id:
+            actor_name = actor["name"]
+            break
+
+    # 2. FALLBACK: SCRAPE NAME FROM ACTOR'S MOVIE RESULTS PAGE (Reliable fallback)
+    if actor_name == "Unknown Actor":
+        # This call uses the robust scraping logic
+        scraped_name = get_actor_name_from_movie_results_page(corrected, actor_id)
+        if scraped_name:
+            actor_name = scraped_name
+
+    return jsonify({
+        "language": corrected,
+        "actor_id": actor_id,
+        "actor_name": actor_name,
+        "page": page,
+        "movies": movies,
+        "next_page": page + 1,
+        "has_more": len(movies) > 0
+    })
+
+
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
