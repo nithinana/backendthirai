@@ -313,6 +313,43 @@ def extract_video_url(page_url: str) -> str | None:
 
     return None
 
+# ----------------- PRELOAD LOGIC -----------------
+
+def preload_recent_movies_for_all_languages():
+    """
+    Pre-fetches the 'recent' movies list (page 1) for all supported languages
+    and stores them in the movie_list_cache upon server startup.
+    This ensures fast access for initial requests.
+    """
+    print("Starting movie list pre-load process...")
+    start_time = time.time()
+    
+    # We only preload the first page of recent movies (page=1)
+    base_url = "https://einthusan.tv/movie/results/?find=Recent&lang={lang_code}&page=1"
+    
+    results = {}
+    
+    for language, lang_code in LANGUAGE_CODES.items():
+        url = base_url.format(lang_code=lang_code)
+        
+        # Calling fetch_movies_by_url will populate the movie_list_cache
+        try:
+            movies = fetch_movies_by_url(url)
+            if movies:
+                results[language] = f"SUCCESS: {len(movies)} movies found."
+            else:
+                # Log if the call succeeded but returned no movies (e.g., empty result page)
+                results[language] = "WARNING: No movies found for this language."
+        except Exception as e:
+            # Log any exception during the fetch process
+            results[language] = f"ERROR: Failed to fetch due to exception: {e}"
+            
+    end_time = time.time()
+    print("--- Movie List Pre-load Results ---")
+    for lang, result in results.items():
+        print(f"[{lang.upper()}]: {result}")
+    print(f"Pre-load finished in {end_time - start_time:.2f} seconds.")
+
 # ----------------- ROUTES -----------------
 @app.get("/")
 def root():
@@ -342,6 +379,8 @@ def language_page(language):
     if category == "popular":
         url = f"https://einthusan.tv/movie/results/?find=Popularity&lang={lang_code}&ptype=view&tp=alltime&page={page}"
     else:  # recent (default)
+        # This URL is the same one used in the preload function for page=1, 
+        # so initial requests for recent movies will hit the cache.
         url = f"https://einthusan.tv/movie/results/?find=Recent&lang={lang_code}&page={page}"
 
     movies = fetch_movies_by_url(url)
@@ -443,4 +482,10 @@ def actor_movies_route(language, actor_id):
 
 
 if __name__ == "__main__":
+    # Start the pre-loading process in a background thread so the server
+    # doesn't block while waiting for all movie lists to load.
+    preload_thread = threading.Thread(target=preload_recent_movies_for_all_languages)
+    preload_thread.start()
+    
+    # Run the Flask app
     app.run(host="0.0.0.0", port=5000)
